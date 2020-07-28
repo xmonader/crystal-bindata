@@ -1,27 +1,66 @@
 # crystal-bindata
 
-TODO: Write a description here
+embed data (mainly static assets) in crystal binary
 
-## Installation
-
-TODO: Write installation instructions here
 
 ## Usage
 
-TODO: Write usage instructions here
+### Dir we want to bundle
 
-## Development
+```
+➜  crystal-bindata git:(development) ✗ ls spec 
+crystal-bindata_spec.cr  spec_helper.cr
+```
 
-TODO: Write development instructions here
+generate assets file us`crystal-bindata -s $(pwd)/spec`, if you don't specify out file data will be written on stdout.
 
-## Contributing
 
-1. Fork it (<https://github.com/your-github-user/crystal-bindata/fork>)
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new Pull Request
 
-## Contributors
+### Running
 
-- [your-name-here](https://github.com/your-github-user) - creator and maintainer
+```
+➜  crystal-bindata git:(development) ✗ crystal run simpletest.cr
+require "spec"
+require "../src/crystal-bindata"
+```
+
+### Generated filed
+
+```
+➜  crystal-bindata git:(development) ✗ cat myfile.cr
+
+require "base64"
+
+
+module BinData
+    @@ASSETS = {} of String => String
+
+    def self.add_asset(thepath : String, b64data : String)
+        @@ASSETS[thepath] = b64data
+    end
+    def self.getAsset(filepath : String)
+        Base64.decode_string(@@ASSETS[filepath])
+    end
+
+
+    self.add_asset("/home/xmonader/wspace/crystal-bindata/spec/spec_helper.cr", "cmVxdWlyZSAic3BlYyIKcmVxdWlyZSAiLi4vc3JjL2NyeXN0YWwtYmluZGF0
+YSIK
+")
+
+    self.add_asset("/home/xmonader/wspace/crystal-bindata/spec/crystal-bindata_spec.cr", "cmVxdWlyZSAiLi9zcGVjX2hlbHBlciIKCmRlc2NyaWJlIENyeXN0YWw6OkJp
+bmRhdGEgZG8KICAjIFRPRE86IFdyaXRlIHRlc3RzCgogIGl0ICJ3b3JrcyIg
+ZG8KICAgIGZhbHNlLnNob3VsZCBlcSh0cnVlKQogIGVuZAplbmQK
+")
+end
+
+```
+
+
+### File using the assets
+
+```crystal
+require "./myfile"
+
+puts BinData.getAsset("/home/xmonader/wspace/crystal-bindata/spec/spec_helper.cr")
+
+```
